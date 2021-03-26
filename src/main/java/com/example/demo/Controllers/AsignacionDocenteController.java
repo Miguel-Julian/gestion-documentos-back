@@ -2,6 +2,7 @@ package com.example.demo.Controllers;
 
 import com.example.demo.Model.AsignacionDocente;
 import com.example.demo.Model.AsignacionPK;
+import com.example.demo.Model.TipoDocumento;
 import com.example.demo.Services.AsignacionDocenteServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +31,14 @@ public class AsignacionDocenteController {
 
     @PostMapping("/registrar")
     public List<String> registrarAsignacion (@Valid @RequestBody AsignacionDocente asignacionDocente, BindingResult bd, SessionStatus sd){
+        //verificar si se esta guardando o actualizando
+        List<AsignacionDocente> asignacionDocentes = asignacionDocenteServices.listar();
+        boolean flag = true;
+        for(int i = 0; i < asignacionDocentes.size(); i++) {
+            if (asignacionDocentes.get(i).getCurso().getIdCurso()==asignacionDocente.getCurso().getIdCurso() && asignacionDocentes.get(i).getMateria().getIdMateria()==asignacionDocente.getMateria().getIdMateria()){
+                flag = false;
+            }
+        }
         //Verificar si hay errores
         List<String> messageList = new ArrayList<>();
         String message="";
@@ -44,7 +53,8 @@ public class AsignacionDocenteController {
             }
         } else {
             try {
-                message = (asignacionDocente.getCurso()==null && asignacionDocente.getMateria()==null)?"Se ha asignado correctamente el curso y la materia": "Datos actualizados";
+
+                message = (flag)?"Se ha asignado correctamente el curso y la materia": "Datos actualizados";
                 AsignacionPK asignacionPK = new AsignacionPK();
                 asignacionPK.setIdCurso(asignacionDocente.getCurso().getIdCurso());
                 asignacionPK.setIdMateria(asignacionDocente.getMateria().getIdMateria());
@@ -54,7 +64,7 @@ public class AsignacionDocenteController {
             } catch (DataIntegrityViolationException e) {
                 //message = getConstraintMessage(e.getMostSpecificCause().getMessage());
             } catch (Exception e) {
-                message = ((asignacionDocente.getCurso()==null && asignacionDocente.getMateria()==null)) ? "Error al realizar la asignacion" : "Error al realizar los cambios";
+                message = ((flag)) ? "Error al realizar la asignacion" : "Error al realizar los cambios";
             }
             messageList.add(message);
         }
