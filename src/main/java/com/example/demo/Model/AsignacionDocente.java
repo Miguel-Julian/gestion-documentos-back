@@ -18,17 +18,17 @@ public class AsignacionDocente implements Serializable {
 
     @Getter
     @Setter
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne()
     private Curso curso;
 
     @Getter
     @Setter
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne()
     private Materia materia;
 
     @Getter
     @Setter
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne()
     private Docente docente;
 
     @Getter

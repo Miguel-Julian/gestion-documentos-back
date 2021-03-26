@@ -146,9 +146,6 @@ public class DocenteServices {
         usuario.setRol("Docente");
         usuario.setEstado(true);
 
-        System.out.println("askjdhfgjdfklj");
-
-
         StringTokenizer tokens = new StringTokenizer(docente.getApellidoDocente());
         String primeraApellido = tokens.nextToken();
         String nombreUsuario = docente.getNombreDocente().charAt(0)+primeraApellido;
