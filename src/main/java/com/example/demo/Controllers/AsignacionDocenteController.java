@@ -54,7 +54,7 @@ public class AsignacionDocenteController {
         } else {
             try {
 
-                message = (flag)?"Se ha asignado correctamente el curso y la materia": "Datos actualizados";
+                message = (flag)?"Se ha asignado correctamente el curso y la materia": "Se ha asignado correctamente el curso y la materia";
                 AsignacionPK asignacionPK = new AsignacionPK();
                 asignacionPK.setIdCurso(asignacionDocente.getCurso().getIdCurso());
                 asignacionPK.setIdMateria(asignacionDocente.getMateria().getIdMateria());
