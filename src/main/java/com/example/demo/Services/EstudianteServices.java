@@ -31,6 +31,9 @@ public class EstudianteServices {
 
     @Autowired
     UsuarioService usuarioService;
+
+    private long dni =0;
+
     public void registrarEstudiante (Estudiante estudiante) {
         iDaoEstudiante.save(estudiante);
     }
@@ -44,13 +47,20 @@ public class EstudianteServices {
     }
 
 
-    public void save (MultipartFile file) {
+    public String save (MultipartFile file) {
+        String message = "";
         try {
             List<Estudiante> Estudiantes = excelToEstudiantes(file.getInputStream());
-            iDaoEstudiante.saveAll(Estudiantes);
+            if(dni == 0){
+                iDaoEstudiante.saveAll(Estudiantes);
+                message="!Subió el archivo con éxito!";
+            }else{
+                message = "El numero de tarjeta: " +dni+ " Ya existe";
+            }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }
+        return message;
     }
 
 
@@ -127,8 +137,10 @@ public class EstudianteServices {
                                 }
                             }
                             estudiante.setEstado(true);
+                            if(verificarDNI(estudiante.getDniEstudiante()) !=0){
+                                dni =verificarDNI(estudiante.getDniEstudiante());
+                            }
                             estudiante.setUsuario(DatosUsuario(estudiante));
-                            usuarioService.registrarUsuario(estudiante.getUsuario());
                             break;
 
                         default:
@@ -140,7 +152,13 @@ public class EstudianteServices {
                 Estudiantes.add(estudiante);
             }
             workbook.close();
-
+            if(dni !=0){
+                Estudiantes.clear();
+            }else{
+                for(int i = 0; i < Estudiantes.size(); i++) {
+                    usuarioService.registrarUsuario(Estudiantes.get(i).getUsuario());
+                }
+            }
             return Estudiantes;
         } catch (IOException e) {
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
@@ -173,5 +191,16 @@ public class EstudianteServices {
         usuario.setNombreUsuario(nombreUsuario);
 
         return usuario;
+    }
+
+    private long verificarDNI(long DNI){
+        long flag = 0;
+        List<Estudiante> estudiantes = Listar();
+        for(int i = 0; i < estudiantes.size(); i++){
+            if(estudiantes.get(i).getDniEstudiante() == DNI){
+                flag = DNI;
+            }
+        }
+        return flag;
     }
 }

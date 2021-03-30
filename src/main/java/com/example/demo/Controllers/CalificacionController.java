@@ -61,10 +61,5 @@ public class CalificacionController {
         return calificacionServices.consultarCalificacion(idCalificacion);
     }
 
-    @PutMapping(path = ("/{id}"))
-    public Calificacion editarCalificacion (@RequestBody Calificacion calificacion, @PathVariable("id") int id){
-        calificacion.setIdCalificacion(id);
-        return calificacionServices.updateCalificacion(calificacion);
-    }
 
 }

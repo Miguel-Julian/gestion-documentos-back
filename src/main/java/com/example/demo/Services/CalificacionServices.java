@@ -23,8 +23,4 @@ public class CalificacionServices {
     public Calificacion consultarCalificacion(long idCalificacion){
         return iDaoCalificacion.findById(idCalificacion).orElse(null);
     }
-
-    public Calificacion updateCalificacion (Calificacion calificacion){
-        return iDaoCalificacion.save(calificacion);
-    }
 }

@@ -2,7 +2,6 @@ package com.example.demo.Services;
 
 import com.example.demo.Dao.IDaoDocente;
 import com.example.demo.Model.Docente;
-import com.example.demo.Model.Estudiante;
 import com.example.demo.Model.TipoDocumento;
 import com.example.demo.Model.Usuario;
 import org.apache.poi.ss.usermodel.Cell;
@@ -31,6 +30,9 @@ public class DocenteServices {
 
     @Autowired
     UsuarioService usuarioService;
+
+    private long dni =0;
+
     public List<Docente> listarDocentes (){
         return iDaoDocente.findAllByEstado(true);
     }
@@ -43,13 +45,21 @@ public class DocenteServices {
         return iDaoDocente.findById(idDocente).orElse(null);
     }
 
-    public void save (MultipartFile file) {
+    public String save (MultipartFile file) {
+        String message = "";
         try {
             List<Docente> Docentes = excelToDocentes(file.getInputStream());
-            iDaoDocente.saveAll(Docentes);
+            if(dni == 0){
+                iDaoDocente.saveAll(Docentes);
+                message="!Subió el archivo con éxito!";
+            }else{
+                message = "El numero de tarjeta: " +dni+ " Ya existe";
+            }
+
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }
+        return message;
     }
 
 
@@ -116,8 +126,10 @@ public class DocenteServices {
                         case 7:
                             docente.setCiudadDocente(currentCell.getStringCellValue());
                             docente.setEstado(true);
+                            if(verificarDNI(docente.getDniDocente()) !=0){
+                                dni =verificarDNI(docente.getDniDocente());
+                            }
                             docente.setUsuario(DatosDocente(docente));
-                            usuarioService.registrarUsuario(docente.getUsuario());
                             break;
 
                         default:
@@ -129,6 +141,13 @@ public class DocenteServices {
                 Docentes.add(docente);
             }
             workbook.close();
+            if(dni !=0){
+                Docentes.clear();
+            }else{
+                for(int i = 0; i < Docentes.size(); i++) {
+                    usuarioService.registrarUsuario(Docentes.get(i).getUsuario());
+                }
+            }
 
             return Docentes;
         } catch (IOException e) {
@@ -161,5 +180,15 @@ public class DocenteServices {
         usuario.setNombreUsuario(nombreUsuario);
 
         return usuario;
+    }
+    private long verificarDNI(long DNI){
+        long flag = 0;
+        List<Docente> docentes = listarDocentes();
+        for(int i = 0; i < docentes.size(); i++){
+            if(docentes.get(i).getDniDocente() == DNI){
+                flag = DNI;
+            }
+        }
+        return flag;
     }
 }

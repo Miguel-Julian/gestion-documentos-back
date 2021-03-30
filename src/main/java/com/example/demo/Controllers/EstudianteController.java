@@ -70,20 +70,21 @@ public class EstudianteController {
     }
 
     @PostMapping("/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file) {
+    public List<String>  uploadFile(@RequestParam("file") MultipartFile file) {
         String message = "¡Sube un archivo de Excel!";
+        List<String> messageList = new ArrayList<>();
         String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         if (TYPE.equals(file.getContentType())) {
             try {
-                estudianteServices.save(file);
-                message = "Subió el archivo con éxito: " + file.getOriginalFilename();
+                message= estudianteServices.save(file);
             } catch (Exception e) {
                 System.out.println(e);
                 message = "No se pudo cargar el archivo.: " + file.getOriginalFilename() + "!";
             }
         }
-        return message;
+        messageList.add(message);
+        return messageList;
     }
 }
 
