@@ -1,11 +1,11 @@
 package com.example.demo.Controllers;
 
 import com.example.demo.Model.Docente;
-import com.example.demo.Model.Estudiante;
 import com.example.demo.Services.DocenteServices;
-import com.example.demo.Services.UsuarioService;
+import com.example.demo.Security.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -30,6 +30,7 @@ public class DocenteController {
         return docenteServices.listarDocentes();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/registrar")
     public List<String> registrarDocente (@Valid @RequestBody Docente docente, BindingResult bd, SessionStatus sd){
         //Verificar si hay errores
@@ -66,7 +67,7 @@ public class DocenteController {
         return docenteServices.consultarDocente(idDocente);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload")
     public List<String> uploadFile(@RequestParam("file") MultipartFile file) {
         String message = "¡Sube un archivo de Excel!";

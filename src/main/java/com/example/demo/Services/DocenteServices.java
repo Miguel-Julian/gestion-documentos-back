@@ -3,7 +3,8 @@ package com.example.demo.Services;
 import com.example.demo.Dao.IDaoDocente;
 import com.example.demo.Model.Docente;
 import com.example.demo.Model.TipoDocumento;
-import com.example.demo.Model.Usuario;
+import com.example.demo.Security.Model.Usuario;
+import com.example.demo.Security.Service.UsuarioService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -129,7 +130,6 @@ public class DocenteServices {
                             if(verificarDNI(docente.getDniDocente()) !=0){
                                 dni =verificarDNI(docente.getDniDocente());
                             }
-                            docente.setUsuario(DatosDocente(docente));
                             break;
 
                         default:
@@ -145,6 +145,7 @@ public class DocenteServices {
                 Docentes.clear();
             }else{
                 for(int i = 0; i < Docentes.size(); i++) {
+                    Docentes.get(i).setUsuario(DatosDocente(Docentes.get(i)));
                     usuarioService.registrarUsuario(Docentes.get(i).getUsuario());
                 }
             }
@@ -162,7 +163,7 @@ public class DocenteServices {
         List<Usuario> usuarios = usuarioService.listarUsuarios();
 
         usuario.setContrasenia(docente.getDniDocente()+"");
-        usuario.setRol("Docente");
+        usuario.setRol("ROLE_DOCENTE");
         usuario.setEstado(true);
 
         StringTokenizer tokens = new StringTokenizer(docente.getApellidoDocente());

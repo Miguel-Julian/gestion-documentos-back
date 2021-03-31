@@ -6,6 +6,7 @@ import com.example.demo.Model.TipoDocumento;
 import com.example.demo.Services.AsignacionDocenteServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -29,6 +30,7 @@ public class AsignacionDocenteController {
         return asignacionDocenteServices.listar();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/registrar")
     public List<String> registrarAsignacion (@Valid @RequestBody AsignacionDocente asignacionDocente, BindingResult bd, SessionStatus sd){
         //verificar si se esta guardando o actualizando

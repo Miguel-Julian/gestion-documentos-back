@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -34,6 +35,7 @@ public class DocumentosDocenteController {
         return documentosDocenteServices.Listar();
     }
 
+    @PreAuthorize("hasRole('DOCENTE')")
     @PostMapping("/registrar")
     public List<String> registrarDocumentosDocente (@Valid @RequestBody DocumentosDocente documentosDocente, BindingResult bd, SessionStatus sd){
         //Verificar si hay errores
@@ -68,6 +70,7 @@ public class DocumentosDocenteController {
         return documentosDocenteServices.consultarDocumentosDocente(idDocumentosDocente);
     }
 
+    @PreAuthorize("hasRole('DOCENTE')")
     @PostMapping("/upload")
     public String uploadFiles(@RequestParam("file") MultipartFile file){
         //Verificar si hay errores
@@ -90,6 +93,7 @@ public class DocumentosDocenteController {
                 "attachment; filename=\""+file.getFilename() + "\"").body(file);
     }
 
+    @PreAuthorize("hasRole('DOCENTE')")
     @GetMapping("/delete/{filename:.+}")
     public String borrarArchivo(@PathVariable String filename) {
         return documentosDocenteServices.borrarArchivo(filename);
