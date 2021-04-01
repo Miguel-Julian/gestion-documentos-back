@@ -1,15 +1,15 @@
-package com.example.demo.Model;
+package com.example.demo.Security.Model;
 
 import lombok.Getter;
 import lombok.Setter;
 
+
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "Usuarios")
 
-public class Usuario implements Serializable {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +37,8 @@ public class Usuario implements Serializable {
     @Setter
     @Column
     private boolean estado;
+
+
+    public Usuario() {
+    }
 }

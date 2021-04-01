@@ -2,6 +2,8 @@ package com.example.demo.Services;
 
 import com.example.demo.Dao.IDaoEstudiante;
 import com.example.demo.Model.*;
+import com.example.demo.Security.Model.Usuario;
+import com.example.demo.Security.Service.UsuarioService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -140,7 +142,6 @@ public class EstudianteServices {
                             if(verificarDNI(estudiante.getDniEstudiante()) !=0){
                                 dni =verificarDNI(estudiante.getDniEstudiante());
                             }
-                            estudiante.setUsuario(DatosUsuario(estudiante));
                             break;
 
                         default:
@@ -156,6 +157,7 @@ public class EstudianteServices {
                 Estudiantes.clear();
             }else{
                 for(int i = 0; i < Estudiantes.size(); i++) {
+                    Estudiantes.get(i).setUsuario(DatosUsuario(Estudiantes.get(i)));
                     usuarioService.registrarUsuario(Estudiantes.get(i).getUsuario());
                 }
             }
@@ -173,7 +175,7 @@ public class EstudianteServices {
         List<Usuario> usuarios = usuarioService.listarUsuarios();
 
         usuario.setContrasenia(estudiante.getDniEstudiante()+"");
-        usuario.setRol("Estudiante");
+        usuario.setRol("ROLE_ESTUDIANTE");
         usuario.setEstado(true);
 
         StringTokenizer tokens = new StringTokenizer(estudiante.getApellidoEstudiante());

@@ -4,6 +4,7 @@ import com.example.demo.Model.Materia;
 import com.example.demo.Services.MateriaServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -26,6 +27,7 @@ public class MateriaController {
         return materiaServices.listarMaterias();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/registrar")
     public List<String> registrarMateria (@Valid @RequestBody Materia materia, BindingResult bd, SessionStatus sd){
         //Verificar si hay errores
@@ -54,7 +56,6 @@ public class MateriaController {
         }
         return messageList;
     }
-
     @GetMapping("/consultar/{id}")
     public Materia consultarMateria (@PathVariable(value = "id") Long idMateria){
         return materiaServices.consultarMateria(idMateria);

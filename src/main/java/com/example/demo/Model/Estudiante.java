@@ -1,5 +1,6 @@
 package com.example.demo.Model;
 
+import com.example.demo.Security.Model.Usuario;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;

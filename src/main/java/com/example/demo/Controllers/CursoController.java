@@ -4,6 +4,7 @@ import com.example.demo.Model.Curso;
 import com.example.demo.Services.CursoServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -22,12 +23,14 @@ public class CursoController {
     @Autowired
     CursoServices cursoServices;
 
+
     @GetMapping("/listar")
     public List<Curso> listar(){
         //retorna todos los registros que hay en la tabla
         return cursoServices.Listar();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/registrar")
     public List<String> registrarCurso (@Valid @RequestBody Curso curso, BindingResult bd, SessionStatus sd){
         //Verificar si hay errores
@@ -62,10 +65,5 @@ public class CursoController {
         return cursoServices.consultarCurso(idCurso);
     }
 
-    @PutMapping(path = ("/{id}"))
-    public Curso editarCurso (@RequestBody Curso curso, @PathVariable("id") int id){
-        curso.setIdCurso(id);
-        return cursoServices.updateCurso(curso);
-    }
 
 }
