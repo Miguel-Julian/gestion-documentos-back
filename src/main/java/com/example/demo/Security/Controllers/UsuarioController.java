@@ -79,6 +79,7 @@ public class UsuarioController {
         return usuarioService.consultarUsuario(idUsuario);
     }
 
+
     @PostMapping("/login")
     public ResponseEntity<Jwt> login(@Valid @RequestBody Usuario loginUsuario){
         String mensaje = "usuario y/o constaseña incorrectos";
