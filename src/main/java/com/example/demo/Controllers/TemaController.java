@@ -1,7 +1,8 @@
 package com.example.demo.Controllers;
 
-import com.example.demo.Model.TipoDocumento;
-import com.example.demo.Services.TipoDocumentoServices;
+
+import com.example.demo.Model.Tema;
+import com.example.demo.Services.TemaServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,29 +14,27 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/tipoDocumento")
-@SessionAttributes("tipoDocumentoController")
+@RequestMapping("/tema")
+@SessionAttributes("temaController")
+public class TemaController {
 
-public class TipoDocumentoController {
     @Autowired
-    TipoDocumentoServices tipoDocumentoServices;
+    TemaServices temaServices;
 
     @GetMapping("/listar")
-    public List<TipoDocumento> listar(){
-        return tipoDocumentoServices.listar();
+    public List<Tema> listar(){
+        return temaServices.listarTemas();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('DOCENTE')")
     @PostMapping("/registrar")
-    public List<String> registrarTipoDocumento (@Valid @RequestBody TipoDocumento tipoDocumento, BindingResult bd, SessionStatus sd){
+    public List<String> registrarTema (@Valid @RequestBody Tema tema, BindingResult bd, SessionStatus sd){
         //Verificar si hay errores
         List<String> messageList = new ArrayList<>();
         String message="";
-        String[] field = {"nombreTipoDocumento"};
+        String[] field = {"nombreTema", "estado"};
         if (bd.hasErrors()){
             for (String s : field) {
                 if (bd.hasFieldErrors(s)) {
@@ -46,21 +45,20 @@ public class TipoDocumentoController {
             }
         } else {
             try {
-                message = (tipoDocumento.getIdTipoDocumento()==0)?"Se ha guardado el tipo de documento": "Datos actualizados";
-                tipoDocumentoServices.registrarTipoDoc(tipoDocumento);
+                message = (tema.getIdTema()==0)?"Se ha guardado el tema": "Datos actualizados";
+                temaServices.registrarTema(tema);
                 sd.setComplete();
             } catch (DataIntegrityViolationException e) {
                 //message = getConstraintMessage(e.getMostSpecificCause().getMessage());
             } catch (Exception e) {
-                message = ((tipoDocumento.getIdTipoDocumento()==0)) ? "Error al crear el tipo de documento" : "Error al realizar los cambios";
+                message = ((tema.getIdTema() == 0)) ? "Error al crear la tema" : "Error al realizar los cambios";
             }
             messageList.add(message);
         }
         return messageList;
     }
-
     @GetMapping("/consultar/{id}")
-    public TipoDocumento consultarTipoDocumento (@PathVariable(value = "id") Long idTipoDocumento){
-        return tipoDocumentoServices.consultarTipoDoc(idTipoDocumento);
+    public Tema consultarTema (@PathVariable(value = "id") Long idTema){
+        return temaServices.consultarTema(idTema);
     }
 }

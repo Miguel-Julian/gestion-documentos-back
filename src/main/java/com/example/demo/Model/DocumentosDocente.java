@@ -25,7 +25,7 @@ public class DocumentosDocente implements Serializable{
     @Getter
     @Setter
     @ManyToOne(cascade = CascadeType.MERGE)
-    private AsignacionDocente asignacionDocente;
+    private Tema tema;
 
     @Getter
     @Setter
