@@ -45,6 +45,8 @@ public class Calificacion implements Serializable {
     @Column(name = "nota_aprobacion")
     private float notaAprobacion;
 
+
+
     @Getter
     @Setter
     @Column
