@@ -2,8 +2,10 @@ package com.example.demo.Services;
 
 
 import com.example.demo.Dao.IDaoDocumentosDocente;
+import com.example.demo.Dao.IDaoTema;
 import com.example.demo.Model.DocumentosDocente;
 
+import com.example.demo.Model.Tema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,8 +43,8 @@ public class DocumentosDocenteServices {
         iDaoDocumentosDocente.save(documentosDocente);
     }
 
-    public List<DocumentosDocente> Listar(){
-        return iDaoDocumentosDocente.findAllByEstado(true);
+    public List<DocumentosDocente> Listar(Tema tema){
+        return iDaoDocumentosDocente.findAllByEstadoAndTema(true, tema);
     }
 
     public DocumentosDocente consultarDocumentosDocente(long idDocumentosDocente){

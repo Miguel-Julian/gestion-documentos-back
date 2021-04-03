@@ -3,6 +3,7 @@ package com.example.demo.Controllers;
 import com.example.demo.Model.DocumentosDocente;
 import com.example.demo.Services.DocumentosDocenteServices;
 
+import com.example.demo.Services.TemaServices;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,10 +32,12 @@ public class DocumentosDocenteController {
     @Autowired
     DocumentosDocenteServices documentosDocenteServices;
 
-    @GetMapping("/listar")
-    public List<DocumentosDocente> listar(){
-        //retorna todos los registros que hay en la tabla
-        return documentosDocenteServices.Listar();
+    @Autowired
+    TemaServices temaServices;
+
+    @GetMapping("/listar/{id}")
+    public List<DocumentosDocente> listar(@PathVariable(value = "id") long idTema){
+        return documentosDocenteServices.Listar(temaServices.consultarTema(idTema));
     }
 
 

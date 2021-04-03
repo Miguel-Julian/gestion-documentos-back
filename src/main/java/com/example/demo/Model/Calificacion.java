@@ -48,6 +48,12 @@ public class Calificacion implements Serializable {
     @Getter
     @Setter
     @Column
+    private boolean isSelect;
+
+
+    @Getter
+    @Setter
+    @Column
     private boolean estado;
 
     public Calificacion() {

@@ -44,6 +44,9 @@ public class CalificacionController {
             }
         } else {
             try {
+                if(calificacionServices.Listar().size() ==0){
+                    calificacion.setSelect(true);
+                }
                 message = (calificacion.getIdCalificacion()==0)?"Se ha guardado la calificacion": "Datos actualizados";
                 calificacionServices.registrarCalificacion(calificacion);
                 sd.setComplete();
