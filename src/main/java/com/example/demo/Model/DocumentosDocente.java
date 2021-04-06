@@ -3,6 +3,8 @@ package com.example.demo.Model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -12,7 +14,6 @@ import java.util.Date;
 
 @Entity
 @Table(name="Documentos_Docente")
-
 public class DocumentosDocente implements Serializable{
 
     @Id
@@ -25,12 +26,19 @@ public class DocumentosDocente implements Serializable{
     @Getter
     @Setter
     @ManyToOne(cascade = CascadeType.MERGE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Tema tema;
 
     @Getter
     @Setter
     @ManyToOne(cascade = CascadeType.MERGE)
     private Calificacion calificacion;
+
+    @Getter
+    @Setter
+    @Column(name = "nombre_Actividad")
+    @Size(min=3, max=50, message = "El nombre de la Actividad debe estar entre 3 y 50 caracteres")
+    private String nombreActividad;
 
     @Getter
     @Setter
@@ -60,9 +68,13 @@ public class DocumentosDocente implements Serializable{
 
     @Getter
     @Setter
-    @Column(name = "archivo_docente")
-    @Size(min=3, max=255, message = "La direccion del archivo debe estar entre 3 y 255 caracteres")
-    private String archivoDocente;
+    @Column(name = "ruta_Archivo")
+    private String rutaArchivo;
+
+    @Getter
+    @Setter
+    @Column(name = "nombre_Archivo")
+    private String nombreArchivo;
 
     @Getter
     @Setter

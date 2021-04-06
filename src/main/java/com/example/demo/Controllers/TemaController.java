@@ -83,6 +83,8 @@ public class TemaController {
         String message="";
         try {
             temaServices.borrarTema(tema);
+            System.out.println("asañ{sldkfñlklñk");
+            temaServices.borrarTodo(tema.getAsignacionDocente().getCurso().getNombreCurso()+"\\"+tema.getAsignacionDocente().getMateria().getNombreMateria()+"\\"+tema.getNombreTema());
             message = "Tema eliminado";
         }catch (Exception e) {
             message = "Error al borrar el tema";
