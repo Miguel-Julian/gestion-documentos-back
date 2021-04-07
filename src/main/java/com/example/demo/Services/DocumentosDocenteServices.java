@@ -44,11 +44,7 @@ public class DocumentosDocenteServices {
     }
 
     public List<DocumentosDocente> Listar(Tema tema){
-        return iDaoDocumentosDocente.findAllByEstadoAndTema(true, tema);
-    }
-
-    public List<DocumentosDocente> ListarAll(){
-        return iDaoDocumentosDocente.findAllByEstado(true);
+        return iDaoDocumentosDocente.findAllByTema(tema);
     }
 
     public DocumentosDocente consultarDocumentosDocente(long idDocumentosDocente){

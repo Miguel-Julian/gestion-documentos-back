@@ -28,7 +28,6 @@ public class TemaController {
     @Autowired
     AsignacionDocenteServices asignacionDocenteServices;
 
-    @PreAuthorize("hasRole('DOCENTE')")
     @GetMapping("/listar/{id}")
     public List<Tema> listar(@PathVariable(value = "id") String[] valores) {
         AsignacionPK datos = new AsignacionPK();
@@ -37,7 +36,6 @@ public class TemaController {
         return temaServices.listarTemas(asignacionDocenteServices.consultar(datos));
     }
 
-    @PreAuthorize("hasRole('DOCENTE')")
     @GetMapping("/listarFalse/{id}")
     public List<Tema> listarFalse(@PathVariable(value = "id") String[] valores) {
         AsignacionPK datos = new AsignacionPK();

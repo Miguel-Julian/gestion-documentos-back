@@ -42,11 +42,6 @@ public class DocumentosDocenteController {
         return documentosDocenteServices.Listar(temaServices.consultarTema(idTema));
     }
 
-    @GetMapping("/listarAll")
-    public List<DocumentosDocente> listarAll(){
-        //retorna todos los registros que hay en la tabla
-        return documentosDocenteServices.ListarAll();
-    }
 
 
     @PreAuthorize("hasRole('DOCENTE')")
@@ -123,6 +118,7 @@ public class DocumentosDocenteController {
     }
 
 
+
     @GetMapping("/file/{filename:.+}")
     public ResponseEntity<Resource> getFile(@PathVariable String filename){
         Resource file = documentosDocenteServices.cargarArchivo(filename);
@@ -130,11 +126,6 @@ public class DocumentosDocenteController {
                 "attachment; filename=\""+file.getFilename() + "\"").body(file);
     }
 
-    @PreAuthorize("hasRole('DOCENTE')")
-    @GetMapping("/delete/{filename:.+}")
-    public String borrarArchivo(@PathVariable String filename) {
-        return documentosDocenteServices.borrarArchivo(filename);
-    }
 
     @GetMapping("/files/{id}")
     public ResponseEntity<List<String>> getFiles(@PathVariable(value = "id") Long idDocumentosDocente){
