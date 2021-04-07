@@ -19,6 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import javax.validation.Valid;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,13 +43,14 @@ public class DocumentosDocenteController {
     }
 
 
+
     @PreAuthorize("hasRole('DOCENTE')")
     @PostMapping("/registrar")
     public List<String> registrarDocumentosDocente (@Valid @RequestBody DocumentosDocente documentosDocente, BindingResult bd, SessionStatus sd){
         //Verificar si hay errores
         List<String> messageList = new ArrayList<>();
         String message="";
-        String[] field = {"archivoDocente", "estado"};
+        String[] field = {"nombreActividad", "estado"};
         if (bd.hasErrors()){
             for (String s : field) {
                 if (bd.hasFieldErrors(s)) {
@@ -58,9 +61,30 @@ public class DocumentosDocenteController {
             }
         } else {
             try {
-                message = (documentosDocente.getIdDocumentosDocente()==0)?"Se ha guardado la Actividad": "Datos actualizados";
+                if(documentosDocente.getIdDocumentosDocente() == 0){
+                    message = "Se ha guardado la Actividad";
+                    if(documentosDocente.getNombreArchivo() != ""){
+                        documentosDocente.setNombreArchivo(documentosDocenteServices.pasarArchivo(documentosDocente.getRutaArchivo(),documentosDocente.getNombreArchivo()));
+                    }
+                }else{
+                    DocumentosDocente doc = documentosDocenteServices.consultarDocumentosDocente(documentosDocente.getIdDocumentosDocente());// creado para verificar si se cambio el archivo o el nombre
+                    message = "Datos actualizados";
+                    if(!documentosDocente.getNombreArchivo().equals(doc.getNombreArchivo())){
+                        if(doc.getNombreArchivo() == "" && documentosDocente.getNombreArchivo() !=""){
+                            Files.deleteIfExists(Paths.get("c:\\temp\\directorio\\"+doc.getRutaArchivo()+documentosDocente.getNombreArchivo()));
+                        }else if(doc.getNombreArchivo() != "" && documentosDocente.getNombreArchivo() ==""){
+                            Files.deleteIfExists(Paths.get("c:\\temp\\directorio\\"+doc.getRutaArchivo()+doc.getNombreArchivo()));
+                        }else {
+                            Files.deleteIfExists(Paths.get("c:\\temp\\directorio\\"+doc.getRutaArchivo()+doc.getNombreArchivo()));
+                        }
+                    }
+                    if(documentosDocente.getTema().getNombreTema() == ""){
+                        documentosDocente.setTema(doc.getTema());
+                        documentosDocente.setNombreArchivo(documentosDocenteServices.pasarArchivo(doc.getRutaArchivo(),documentosDocente.getNombreArchivo()));
+                    }
+                    documentosDocenteServices.cambiarNombre(doc.getRutaArchivo(),documentosDocente.getRutaArchivo());//al tema
+                }
                 documentosDocenteServices.registrarDocumentosDocente(documentosDocente);
-                documentosDocenteServices.pasarArchivo(documentosDocente.getArchivoDocente());
                 sd.setComplete();
             } catch (DataIntegrityViolationException e) {
                 //message = getConstraintMessage(e.getMostSpecificCause().getMessage());
@@ -94,6 +118,7 @@ public class DocumentosDocenteController {
     }
 
 
+
     @GetMapping("/file/{filename:.+}")
     public ResponseEntity<Resource> getFile(@PathVariable String filename){
         Resource file = documentosDocenteServices.cargarArchivo(filename);
@@ -101,15 +126,12 @@ public class DocumentosDocenteController {
                 "attachment; filename=\""+file.getFilename() + "\"").body(file);
     }
 
-    @PreAuthorize("hasRole('DOCENTE')")
-    @GetMapping("/delete/{filename:.+}")
-    public String borrarArchivo(@PathVariable String filename) {
-        return documentosDocenteServices.borrarArchivo(filename);
-    }
-    @GetMapping("/files")
-    public ResponseEntity<List<String>> getFiles(){
 
-        List<String> fileInfos = documentosDocenteServices.loadAll().map(path -> {
+    @GetMapping("/files/{id}")
+    public ResponseEntity<List<String>> getFiles(@PathVariable(value = "id") Long idDocumentosDocente){
+        DocumentosDocente a = documentosDocenteServices.consultarDocumentosDocente(idDocumentosDocente);
+        documentosDocenteServices.setDireccion(a.getRutaArchivo());
+        List<String> fileInfos = documentosDocenteServices.loadAll(a.getRutaArchivo()).map(path -> {
             String url = MvcUriComponentsBuilder.fromMethodName(DocumentosDocenteController.class, "getFile",
                     path.getFileName().toString()).build().toString();
             return url;

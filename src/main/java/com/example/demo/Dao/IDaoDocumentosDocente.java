@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface IDaoDocumentosDocente extends CrudRepository<DocumentosDocente, Long>{
-    public List<DocumentosDocente> findAllByEstadoAndTema(boolean state, Tema tema);
+    public List<DocumentosDocente> findAllByTema(Tema tema);
 
 }
 

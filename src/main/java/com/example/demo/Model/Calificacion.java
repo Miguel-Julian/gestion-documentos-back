@@ -50,7 +50,7 @@ public class Calificacion implements Serializable {
     @Getter
     @Setter
     @Column
-    private boolean isSelect;
+    private boolean Sel;
 
 
     @Getter

@@ -1,62 +1,54 @@
 package com.example.demo.Services;
 
-
-import com.example.demo.Dao.IDaoDocumentosDocente;
-import com.example.demo.Model.DocumentosDocente;
-
-import com.example.demo.Model.Tema;
-
-import lombok.Setter;
+import com.example.demo.Dao.IDaoDocumentosEstudiante;
+import com.example.demo.Model.DocumentosEstudiante;
+import com.example.demo.Model.DocumentosEstudiantePK;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.net.MalformedURLException;
-
 import java.io.IOException;
-
-import java.nio.file.Path;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Service
-public class DocumentosDocenteServices {
+public class DocumentosEstudianteServices {
+
     @Autowired
-    IDaoDocumentosDocente iDaoDocumentosDocente;
+    IDaoDocumentosEstudiante iDaoDocumentosEstudiante;
 
     private Path root = Paths.get("uploads");
 
     private  String rutaDestinoLocal = "c:\\temp\\directorio\\";
-
-    @Setter
-    private String direccion;
-
-    public void registrarDocumentosDocente (DocumentosDocente documentosDocente) {
-        crearCarpetas(documentosDocente.getRutaArchivo());
-        iDaoDocumentosDocente.save(documentosDocente);
+    public void registrarDocumentosEstudiante (DocumentosEstudiante documentosEstudiante){
+        iDaoDocumentosEstudiante.save(documentosEstudiante);
     }
 
-    public List<DocumentosDocente> Listar(Tema tema){
-        return iDaoDocumentosDocente.findAllByTema(tema);
+    public List<DocumentosEstudiante> listar (){
+        return iDaoDocumentosEstudiante.findAllByEstado(true);
     }
 
-    public DocumentosDocente consultarDocumentosDocente(long idDocumentosDocente){
-        return iDaoDocumentosDocente.findById(idDocumentosDocente).orElse(null);
+    public DocumentosEstudiante consultar (DocumentosEstudiantePK datos){
+        //long[] datos = {1,1};
+        return iDaoDocumentosEstudiante.findById(datos).orElse(null);
     }
 
     //pasar el archivo ya que cuando se guarda en el metodo guardarArchivo() no se tiene la direccion final
-    //por lo que solo se puede pasar despues, cuando ya llega el objeto con la ruta
+    //por lo que solo se puede pasar despues cuando ya llega el objeto con la ruta
     public String pasarArchivo(String ruta,String nombre){
         String nombreNuevo = "";
         try {
-            crearCarpetas(ruta);
+            //Creacion de la carpta destino
+            File direccionArchivo = new File(rutaDestinoLocal+ruta);
+            direccionArchivo.mkdirs();
             Path RutaFinal = Paths.get(rutaDestinoLocal+ruta);
             //cambiar el nombre para agregar-#id- para que no se repitan
             File nombreOriginal = new  File(this.root.toString()+"\\"+nombre);
@@ -68,17 +60,14 @@ public class DocumentosDocenteServices {
             //borrar el archivo en la carpeta "uploads"
             System.out.println(borrarArchivo(nombreNuevo));
         }catch (Exception e) {
-            throw new RuntimeException("No se puede guardar el archivo. Error: " + e.getMessage());
+            throw new RuntimeException("No se puede guardar el archivo. Error " + e.getMessage());
         }
         return  nombreNuevo;
-
     }
 
     public void guardarArchivo(MultipartFile file) {
         try {
             //copy (que queremos copiar, a donde queremos copiar)
-            FileSystemUtils.deleteRecursively(this.root);//borrar  carpeta temporal con todos sus archivos
-            Files.createDirectory(this.root);// creacion de la carpeta temporal (para guardarArchivo())
             Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
         } catch (IOException e) {
             throw new RuntimeException("No se puede guardar el archivo. Error " + e.getMessage());
@@ -86,16 +75,14 @@ public class DocumentosDocenteServices {
     }
 
 
-    public Stream<Path> loadAll(String ruta){
-        //Files.walk recorre nuestras carpetas buscando los archivos
+    public Stream<Path> loadAll(){
+        //Files.walk recorre nuestras carpetas (uploads) buscando los archivos
         // el 1 es la profundidad o nivel que queremos recorrer
         // :: Referencias a metodos
         // Relativize sirve para crear una ruta relativa entre la ruta dada y esta ruta
-        Path ds = Paths.get(rutaDestinoLocal+ruta);
         try{
-            return Files.walk(ds,1).filter(path ->
-                    !Files.isDirectory(path) && !path.equals(ds)
-            ).map(ds::relativize);
+            return Files.walk(this.root,1).filter(path -> !path.equals(this.root))
+                    .map(this.root::relativize);
         }catch (RuntimeException | IOException e){
             throw new RuntimeException("No se pueden cargar los archivos ");
         }
@@ -103,8 +90,7 @@ public class DocumentosDocenteServices {
 
     public Resource cargarArchivo(String filename)  {
         try {
-            Path root1 = Paths.get(rutaDestinoLocal+direccion);
-            Path file = root1.resolve(filename);
+            Path file = root.resolve(filename);
             Resource resource = new UrlResource(file.toUri());
 
             if(resource.exists() || resource.isReadable()){
@@ -131,24 +117,5 @@ public class DocumentosDocenteServices {
             e.printStackTrace();
             return "Error Borrando: "+filename;
         }
-    }
-
-    public void crearCarpetas(String ruta){
-        try {
-            File direccionArchivo = new File(rutaDestinoLocal+ruta);//Creacion de la carpta para guardar el archivo
-            File carpetaArchivosEstudiantes = new File(rutaDestinoLocal+ruta+"Archivos Estudiantes");//Creacion de la carpeta donde se van a guardar los archivos que cargen los estudiantes
-            direccionArchivo.mkdirs();
-            carpetaArchivosEstudiantes.mkdirs();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-    }
-
-    public void cambiarNombre(String Anterior, String nuevo){
-        //cambiar el nombre de la carpeta si entra a modificar
-        File nombreOriginal = new  File(this.rutaDestinoLocal+"\\"+Anterior);
-        File newName = new  File(this.rutaDestinoLocal+nuevo);
-        nombreOriginal.renameTo(newName);
     }
 }
