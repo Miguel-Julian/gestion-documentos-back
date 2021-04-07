@@ -1,6 +1,7 @@
 package com.example.demo.Controllers;
 
 import com.example.demo.Model.DocumentosDocente;
+import com.example.demo.Model.Tema;
 import com.example.demo.Services.DocumentosDocenteServices;
 
 import com.example.demo.Services.TemaServices;
@@ -99,6 +100,23 @@ public class DocumentosDocenteController {
     @GetMapping("/consultar/{id}")
     public DocumentosDocente consultarDocumentosDocente (@PathVariable(value = "id") Long idDocumentosDocente){
         return documentosDocenteServices.consultarDocumentosDocente(idDocumentosDocente);
+    }
+
+    @PreAuthorize("hasRole('DOCENTE')")
+    @PostMapping("/borrar")
+    public List<String> borrarDocumentosDocente (@Valid @RequestBody DocumentosDocente documentosDocente){
+        List<String> messageList = new ArrayList<>();
+        String message="";
+        try {
+            documentosDocenteServices.borrarDocumentosDocente(documentosDocente);
+            documentosDocenteServices.borrarTodo(documentosDocente.getRutaArchivo());
+            message = "Documento Docente eliminado";
+        }catch (Exception e) {
+            message = "Error al borrar el Documento Docente";
+        }
+        System.out.println(message);
+        messageList.add(message);
+        return messageList;
     }
 
     @PreAuthorize("hasRole('DOCENTE')")

@@ -51,6 +51,10 @@ public class DocumentosDocenteServices {
         return iDaoDocumentosDocente.findById(idDocumentosDocente).orElse(null);
     }
 
+    public void borrarDocumentosDocente (DocumentosDocente documentosDocente) {
+        crearCarpetas(documentosDocente.getRutaArchivo());
+        iDaoDocumentosDocente.delete(documentosDocente);
+    }
     //pasar el archivo ya que cuando se guarda en el metodo guardarArchivo() no se tiene la direccion final
     //por lo que solo se puede pasar despues, cuando ya llega el objeto con la ruta
     public String pasarArchivo(String ruta,String nombre){
