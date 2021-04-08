@@ -1,8 +1,11 @@
 package com.example.demo.Services;
 
 import com.example.demo.Dao.IDaoDocumentosEstudiante;
+import com.example.demo.Model.DocumentosDocente;
 import com.example.demo.Model.DocumentosEstudiante;
 import com.example.demo.Model.DocumentosEstudiantePK;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -27,7 +30,12 @@ public class DocumentosEstudianteServices {
 
     private Path root = Paths.get("uploads");
 
+    @Getter
     private  String rutaDestinoLocal = "c:\\temp\\directorio\\";
+
+    @Setter
+    private String direccion;
+
     public void registrarDocumentosEstudiante (DocumentosEstudiante documentosEstudiante){
         iDaoDocumentosEstudiante.save(documentosEstudiante);
     }
@@ -36,19 +44,20 @@ public class DocumentosEstudianteServices {
         return iDaoDocumentosEstudiante.findAllByEstado(true);
     }
 
+    public List<DocumentosEstudiante> listarByDocDocente (DocumentosDocente documentosDocente){
+        return iDaoDocumentosEstudiante.findAllByDocumentosDocente(documentosDocente);
+    }
+
     public DocumentosEstudiante consultar (DocumentosEstudiantePK datos){
         //long[] datos = {1,1};
         return iDaoDocumentosEstudiante.findById(datos).orElse(null);
     }
 
     //pasar el archivo ya que cuando se guarda en el metodo guardarArchivo() no se tiene la direccion final
-    //por lo que solo se puede pasar despues cuando ya llega el objeto con la ruta
+    //por lo que solo se puede pasar despues, cuando ya llega el objeto con la ruta
     public String pasarArchivo(String ruta,String nombre){
         String nombreNuevo = "";
         try {
-            //Creacion de la carpta destino
-            File direccionArchivo = new File(rutaDestinoLocal+ruta);
-            direccionArchivo.mkdirs();
             Path RutaFinal = Paths.get(rutaDestinoLocal+ruta);
             //cambiar el nombre para agregar-#id- para que no se repitan
             File nombreOriginal = new  File(this.root.toString()+"\\"+nombre);
@@ -60,14 +69,17 @@ public class DocumentosEstudianteServices {
             //borrar el archivo en la carpeta "uploads"
             System.out.println(borrarArchivo(nombreNuevo));
         }catch (Exception e) {
-            throw new RuntimeException("No se puede guardar el archivo. Error " + e.getMessage());
+            throw new RuntimeException("No se puede guardar el archivo. Error: " + e.getMessage());
         }
         return  nombreNuevo;
+
     }
 
     public void guardarArchivo(MultipartFile file) {
         try {
             //copy (que queremos copiar, a donde queremos copiar)
+            FileSystemUtils.deleteRecursively(this.root);//borrar  carpeta temporal con todos sus archivos
+            Files.createDirectory(this.root);// creacion de la carpeta temporal (para guardarArchivo())
             Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
         } catch (IOException e) {
             throw new RuntimeException("No se puede guardar el archivo. Error " + e.getMessage());
@@ -75,14 +87,16 @@ public class DocumentosEstudianteServices {
     }
 
 
-    public Stream<Path> loadAll(){
-        //Files.walk recorre nuestras carpetas (uploads) buscando los archivos
+    public Stream<Path> loadAll(String ruta){
+        //Files.walk recorre nuestras carpetas buscando los archivos
         // el 1 es la profundidad o nivel que queremos recorrer
         // :: Referencias a metodos
         // Relativize sirve para crear una ruta relativa entre la ruta dada y esta ruta
+        Path ds = Paths.get(rutaDestinoLocal+ruta);
         try{
-            return Files.walk(this.root,1).filter(path -> !path.equals(this.root))
-                    .map(this.root::relativize);
+            return Files.walk(ds,1).filter(path ->
+                    !Files.isDirectory(path) && !path.equals(ds)
+            ).map(ds::relativize);
         }catch (RuntimeException | IOException e){
             throw new RuntimeException("No se pueden cargar los archivos ");
         }
@@ -90,7 +104,8 @@ public class DocumentosEstudianteServices {
 
     public Resource cargarArchivo(String filename)  {
         try {
-            Path file = root.resolve(filename);
+            Path root1 = Paths.get(rutaDestinoLocal+direccion);
+            Path file = root1.resolve(filename);
             Resource resource = new UrlResource(file.toUri());
 
             if(resource.exists() || resource.isReadable()){
@@ -104,10 +119,6 @@ public class DocumentosEstudianteServices {
         }
     }
 
-    public void borrarTodo(String ruta) {
-        FileSystemUtils.deleteRecursively(new File(rutaDestinoLocal+ruta));
-    }
-
 
     public String borrarArchivo(String filename){
         try {
@@ -118,4 +129,5 @@ public class DocumentosEstudianteServices {
             return "Error Borrando: "+filename;
         }
     }
+
 }

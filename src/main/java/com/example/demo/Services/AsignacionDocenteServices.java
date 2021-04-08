@@ -29,7 +29,6 @@ public class AsignacionDocenteServices {
     }
 
     public List<AsignacionDocente> consultarByDocente (Docente Docente){
-        //long[] datos = {1,1};
         return iDaoAsignacionDocente.findAllByDocente(Docente);
     }
 

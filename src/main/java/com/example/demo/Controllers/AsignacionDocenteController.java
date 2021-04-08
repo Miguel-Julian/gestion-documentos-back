@@ -38,12 +38,6 @@ public class AsignacionDocenteController {
     public List<String> registrarAsignacion (@Valid @RequestBody AsignacionDocente asignacionDocente, BindingResult bd, SessionStatus sd){
         //verificar si se esta guardando o actualizando
         List<AsignacionDocente> asignacionDocentes = asignacionDocenteServices.listar();
-        boolean flag = true;
-        for(int i = 0; i < asignacionDocentes.size(); i++) {
-            if (asignacionDocentes.get(i).getCurso().getIdCurso()==asignacionDocente.getCurso().getIdCurso() && asignacionDocentes.get(i).getMateria().getIdMateria()==asignacionDocente.getMateria().getIdMateria()){
-                flag = false;
-            }
-        }
         //Verificar si hay errores
         List<String> messageList = new ArrayList<>();
         String message="";
@@ -59,7 +53,7 @@ public class AsignacionDocenteController {
         } else {
             try {
 
-                message = (flag)?"Se ha asignado correctamente el curso y la materia": "Se ha asignado correctamente el curso y la materia";
+                message = "Se ha asignado correctamente el curso y la materia";
                 AsignacionPK asignacionPK = new AsignacionPK();
                 asignacionPK.setIdCurso(asignacionDocente.getCurso().getIdCurso());
                 asignacionPK.setIdMateria(asignacionDocente.getMateria().getIdMateria());
@@ -69,7 +63,7 @@ public class AsignacionDocenteController {
             } catch (DataIntegrityViolationException e) {
                 //message = getConstraintMessage(e.getMostSpecificCause().getMessage());
             } catch (Exception e) {
-                message = ((flag)) ? "Error al realizar la asignacion" : "Error al realizar los cambios";
+                message = "Error al realizar los cambios";
             }
             messageList.add(message);
         }

@@ -1,7 +1,6 @@
 package com.example.demo.Controllers;
 
 import com.example.demo.Model.DocumentosDocente;
-import com.example.demo.Model.Tema;
 import com.example.demo.Services.DocumentosDocenteServices;
 
 import com.example.demo.Services.TemaServices;
@@ -72,11 +71,11 @@ public class DocumentosDocenteController {
                     message = "Datos actualizados";
                     if(!documentosDocente.getNombreArchivo().equals(doc.getNombreArchivo())){
                         if(doc.getNombreArchivo() == "" && documentosDocente.getNombreArchivo() !=""){
-                            Files.deleteIfExists(Paths.get("c:\\temp\\directorio\\"+doc.getRutaArchivo()+documentosDocente.getNombreArchivo()));
+                            Files.deleteIfExists(Paths.get(documentosDocenteServices.getRutaDestinoLocal()+doc.getRutaArchivo()+documentosDocente.getNombreArchivo()));
                         }else if(doc.getNombreArchivo() != "" && documentosDocente.getNombreArchivo() ==""){
-                            Files.deleteIfExists(Paths.get("c:\\temp\\directorio\\"+doc.getRutaArchivo()+doc.getNombreArchivo()));
+                            Files.deleteIfExists(Paths.get(documentosDocenteServices.getRutaDestinoLocal()+doc.getRutaArchivo()+doc.getNombreArchivo()));
                         }else {
-                            Files.deleteIfExists(Paths.get("c:\\temp\\directorio\\"+doc.getRutaArchivo()+doc.getNombreArchivo()));
+                            Files.deleteIfExists(Paths.get(documentosDocenteServices.getRutaDestinoLocal()+documentosDocente.getRutaArchivo()+documentosDocente.getNombreArchivo()));
                         }
                     }
                     if(documentosDocente.getTema().getNombreTema() == ""){

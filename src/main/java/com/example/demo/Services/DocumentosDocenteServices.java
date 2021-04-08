@@ -6,6 +6,7 @@ import com.example.demo.Model.DocumentosDocente;
 
 import com.example.demo.Model.Tema;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class DocumentosDocenteServices {
 
     private Path root = Paths.get("uploads");
 
+    @Getter
     private  String rutaDestinoLocal = "c:\\temp\\directorio\\";
 
     @Setter
@@ -55,6 +57,7 @@ public class DocumentosDocenteServices {
         crearCarpetas(documentosDocente.getRutaArchivo());
         iDaoDocumentosDocente.delete(documentosDocente);
     }
+
     //pasar el archivo ya que cuando se guarda en el metodo guardarArchivo() no se tiene la direccion final
     //por lo que solo se puede pasar despues, cuando ya llega el objeto con la ruta
     public String pasarArchivo(String ruta,String nombre){

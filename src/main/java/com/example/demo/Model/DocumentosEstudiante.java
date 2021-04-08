@@ -50,7 +50,7 @@ public class DocumentosEstudiante implements Serializable {
 
     @Getter
     @Setter
-    @Size(min=3, max=250, message = "La descripcion de actividad debe estar entre 3 y 250 caracteres")
+    @Size(max=250, message = "La descripcion de actividad debe estar entre 3 y 250 caracteres")
     private String comentario;
 
     @Getter
