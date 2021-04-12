@@ -41,7 +41,7 @@ public class DocumentosEstudianteController {
         return documentosEstudianteServices.listar();
     }
 
-    @GetMapping("/listarPorDocente/{id}")
+    @GetMapping("/listarByDocDocente/{id}")
     public List<DocumentosEstudiante> listarByDocDocente(@PathVariable(value = "id") long id){
         return documentosEstudianteServices.listarByDocDocente(documentosDocenteServices.consultarDocumentosDocente(id));
     }
@@ -65,17 +65,12 @@ public class DocumentosEstudianteController {
             }
         } else {
             try {
-
                 message = "Se ha asignado correctamente el Estudiante y la Actividad";
                 DocumentosEstudiantePK documentosEstudiantePK = new DocumentosEstudiantePK();
                 documentosEstudiantePK.setIdDocumentosDocente(documentoEstudiante.getDocumentosDocente().getIdDocumentosDocente());
                 documentosEstudiantePK.setIdEstudiante(documentoEstudiante.getEstudiante().getIdEstudiante());
                 documentoEstudiante.setDocumentosEstudiantePK(documentosEstudiantePK);
-                if(documentoEstudiante.getNombreArchivo() == ""){
-                    Files.deleteIfExists(Paths.get(documentoEstudiante.getRutaArchivo()+documentoEstudiante.getNombreArchivo()));
-                }else{
-                    documentosEstudianteServices.pasarArchivo(documentoEstudiante.getRutaArchivo(),documentoEstudiante.getNombreArchivo());
-                }
+                documentoEstudiante.setNombreArchivo(documentosEstudianteServices.pasarArchivo(documentoEstudiante.getRutaArchivo(),documentoEstudiante.getNombreArchivo()));
                 documentosEstudianteServices.registrarDocumentosEstudiante(documentoEstudiante);
                 sd.setComplete();
             } catch (DataIntegrityViolationException e) {
@@ -132,7 +127,7 @@ public class DocumentosEstudianteController {
         DocumentosEstudiante a = documentosEstudianteServices.consultar(documentosEstudiantePK);
         documentosEstudianteServices.setDireccion(a.getRutaArchivo());
         List<String> fileInfos = documentosEstudianteServices.loadAll(a.getRutaArchivo()).map(path -> {
-            String url = MvcUriComponentsBuilder.fromMethodName(DocumentosDocenteController.class, "getFile",
+            String url = MvcUriComponentsBuilder.fromMethodName(DocumentosEstudianteController.class, "getFile",
                     path.getFileName().toString()).build().toString();
             return url;
         }).collect(Collectors.toList());
