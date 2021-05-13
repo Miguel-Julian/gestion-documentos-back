@@ -1,5 +1,6 @@
 package com.example.demo.Controllers;
 
+import com.example.demo.Model.DocumentosDocente;
 import com.example.demo.Model.DocumentosEstudiante;
 import com.example.demo.Model.DocumentosEstudiantePK;
 import com.example.demo.Services.DocumentosDocenteServices;
@@ -18,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,7 +69,9 @@ public class DocumentosEstudianteController {
                 documentosEstudiantePK.setIdDocumentosDocente(documentoEstudiante.getDocumentosDocente().getIdDocumentosDocente());
                 documentosEstudiantePK.setIdEstudiante(documentoEstudiante.getEstudiante().getIdEstudiante());
                 documentoEstudiante.setDocumentosEstudiantePK(documentosEstudiantePK);
-                documentoEstudiante.setNombreArchivo(documentosEstudianteServices.pasarArchivo(documentoEstudiante.getRutaArchivo(),documentoEstudiante.getNombreArchivo()));
+                if(documentoEstudiante.isEstado() == false){
+                    documentoEstudiante.setNombreArchivo(documentosEstudianteServices.pasarArchivo(documentoEstudiante.getRutaArchivo(),documentoEstudiante.getNombreArchivo(),documentosEstudiantePK.getIdDocumentosDocente()+""+documentosEstudiantePK.getIdEstudiante()));
+                }
                 documentosEstudianteServices.registrarDocumentosEstudiante(documentoEstudiante);
                 sd.setComplete();
             } catch (DataIntegrityViolationException e) {
@@ -92,6 +93,10 @@ public class DocumentosEstudianteController {
     }
 
 
+    @GetMapping("/notaDefinitiva/{id}")
+    public float notaDefinitiva(@PathVariable(value = "id") String[] valores){
+        return documentosEstudianteServices.notaDefinitiva(Long.parseLong(valores[0]),Long.parseLong(valores[1]),Long.parseLong(valores[2]));
+    }
 
     @PreAuthorize("hasRole('ESTUDIANTE')")
     @PostMapping("/upload")

@@ -25,8 +25,15 @@ public class TemaServices {
         return iDaoTema.findAllByEstadoAndAndAsignacionDocente(false, AsignacionDocente);
     }
 
-    public void registrarTema (Tema tema){
+    public void registrarTema (Tema tema,String nombreAnterior){
         iDaoTema.save(tema);
+        File carpetaTema = new File(rutaDestinoLocal+tema.getAsignacionDocente().getCurso().getNombreCurso()+"\\"+tema.getAsignacionDocente().getMateria().getNombreMateria()+"\\"+nombreAnterior);
+        if(carpetaTema.exists()){
+            File nuevoNombre = new  File(rutaDestinoLocal+tema.getAsignacionDocente().getCurso().getNombreCurso()+"\\"+tema.getAsignacionDocente().getMateria().getNombreMateria()+"\\"+tema.getNombreTema());
+            carpetaTema.renameTo(nuevoNombre);
+        }else{
+            carpetaTema.mkdirs();
+        }
     }
 
     public void borrarTema (Tema tema){

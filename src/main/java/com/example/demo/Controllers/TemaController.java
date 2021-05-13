@@ -61,8 +61,15 @@ public class TemaController {
             }
         } else {
             try {
-                message = (tema.getIdTema()==0)?"Se ha guardado el tema": "Datos actualizados";
-                temaServices.registrarTema(tema);
+                if(tema.getIdTema()==0){
+                    message = "Se ha guardado el tema";
+                    temaServices.registrarTema(tema,tema.getNombreTema());
+                }else{
+                    message =  "Datos actualizados";
+                    //obtener el nombre anterior para cambiarlo en la ruta
+                    String nombreAnterior = temaServices.consultarTema(tema.getIdTema()).getNombreTema();
+                    temaServices.registrarTema(tema,nombreAnterior);
+                }
                 sd.setComplete();
             } catch (DataIntegrityViolationException e) {
                 //message = getConstraintMessage(e.getMostSpecificCause().getMessage());
@@ -81,7 +88,6 @@ public class TemaController {
         String message="";
         try {
             temaServices.borrarTema(tema);
-            System.out.println("asañ{sldkfñlklñk");
             temaServices.borrarTodo(tema.getAsignacionDocente().getCurso().getNombreCurso()+"\\"+tema.getAsignacionDocente().getMateria().getNombreMateria()+"\\"+tema.getNombreTema());
             message = "Tema eliminado";
         }catch (Exception e) {

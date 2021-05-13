@@ -1,9 +1,7 @@
 package com.example.demo.Services;
 
 import com.example.demo.Dao.IDaoDocumentosEstudiante;
-import com.example.demo.Model.DocumentosDocente;
-import com.example.demo.Model.DocumentosEstudiante;
-import com.example.demo.Model.DocumentosEstudiantePK;
+import com.example.demo.Model.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,15 @@ public class DocumentosEstudianteServices {
 
     @Autowired
     IDaoDocumentosEstudiante iDaoDocumentosEstudiante;
+
+    @Autowired
+    TemaServices temaServices;
+
+    @Autowired
+    DocumentosDocenteServices documentosDocenteServices;
+
+    @Autowired
+    AsignacionDocenteServices asignacionDocenteServices;
 
     private Path root = Paths.get("uploads");
 
@@ -55,13 +62,13 @@ public class DocumentosEstudianteServices {
 
     //pasar el archivo ya que cuando se guarda en el metodo guardarArchivo() no se tiene la direccion final
     //por lo que solo se puede pasar despues, cuando ya llega el objeto con la ruta
-    public String pasarArchivo(String ruta,String nombre){
+    public String pasarArchivo(String ruta,String nombre,String id){
         String nombreNuevo = "";
         try {
             Path RutaFinal = Paths.get(rutaDestinoLocal+ruta);
             //cambiar el nombre para agregar-#id- para que no se repitan
             File nombreOriginal = new  File(this.root.toString()+"\\"+nombre);
-            nombreNuevo = "-"+ruta.split("-")[1]+"-"+nombre;
+            nombreNuevo = "-"+id+"-"+nombre;
             File newName = new  File(this.root.toString()+"\\"+nombreNuevo);
             nombreOriginal.renameTo(newName);
             //guardar el archivo en la nueva ruta
@@ -130,4 +137,25 @@ public class DocumentosEstudianteServices {
         }
     }
 
+    public float notaDefinitiva(long idCurso,long idMateria,long idEstudiante){
+        float sumaNotas = 0;
+        int count =0;
+        AsignacionPK pk = new AsignacionPK();
+        pk.setIdCurso(idCurso);
+        pk.setIdMateria(idMateria);
+        List<Tema> listTema = temaServices.listarTemas(asignacionDocenteServices.consultar(pk));
+        for (int k =0;k<listTema.size();k++) {
+            List<DocumentosDocente> listDocDocente = documentosDocenteServices.Listar(listTema.get(k));
+            for (int i = 0; i < listDocDocente.size(); i++) {
+                List<DocumentosEstudiante> listEstudiante = iDaoDocumentosEstudiante.findAllByDocumentosDocente(listDocDocente.get(i));
+                for (int j = 0; j < listEstudiante.size(); j++) {
+                    if (listEstudiante.get(j).getDocumentosEstudiantePK().getIdEstudiante() == idEstudiante) {
+                        sumaNotas += listEstudiante.get(j).getNota();
+                        count++;
+                    }
+                }
+            }
+        }
+        return sumaNotas/count;
+    }
 }

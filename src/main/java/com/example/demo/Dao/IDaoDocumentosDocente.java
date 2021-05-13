@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface IDaoDocumentosDocente extends CrudRepository<DocumentosDocente, Long>{
     public List<DocumentosDocente> findAllByTema(Tema tema);
+    DocumentosDocente findTopByOrderByIdDocumentosDocenteDesc();//obtiene el DocumentosDocente con el mayor ID
 
 }
 

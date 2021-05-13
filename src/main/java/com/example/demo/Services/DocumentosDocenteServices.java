@@ -2,9 +2,9 @@ package com.example.demo.Services;
 
 
 import com.example.demo.Dao.IDaoDocumentosDocente;
-import com.example.demo.Model.DocumentosDocente;
-
-import com.example.demo.Model.Tema;
+import com.example.demo.Dao.IDaoDocumentosEstudiante;
+import com.example.demo.Dao.IDaoEstudiante;
+import com.example.demo.Model.*;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +32,11 @@ public class DocumentosDocenteServices {
     @Autowired
     IDaoDocumentosDocente iDaoDocumentosDocente;
 
+    @Autowired
+    IDaoDocumentosEstudiante iDaoDocumentosEstudiante;
+
+    @Autowired
+    IDaoEstudiante iDaoEstudiante;
     private Path root = Paths.get("uploads");
 
     @Getter
@@ -43,6 +48,24 @@ public class DocumentosDocenteServices {
     public void registrarDocumentosDocente (DocumentosDocente documentosDocente) {
         crearCarpetas(documentosDocente.getRutaArchivo());
         iDaoDocumentosDocente.save(documentosDocente);
+        registrarDocsEstudiante(iDaoDocumentosDocente.findTopByOrderByIdDocumentosDocenteDesc());
+    }
+
+    private void registrarDocsEstudiante(DocumentosDocente documentosDocente){
+    try {
+        for(Estudiante estudiante: iDaoEstudiante.findAllByCurso(documentosDocente.getTema().getAsignacionDocente().getCurso())){
+            DocumentosEstudiante documentosEstudiante = new DocumentosEstudiante();
+            DocumentosEstudiantePK documentosEstudiantePk = new DocumentosEstudiantePK();
+            documentosEstudiantePk.setIdEstudiante(estudiante.getIdEstudiante());
+            documentosEstudiantePk.setIdDocumentosDocente(documentosDocente.getIdDocumentosDocente());
+            documentosEstudiante.setDocumentosEstudiantePK(documentosEstudiantePk);
+            documentosEstudiante.setDocumentosDocente(documentosDocente);
+            documentosEstudiante.setEstudiante(estudiante);
+            iDaoDocumentosEstudiante.save(documentosEstudiante);
+        }
+    }catch (Exception e){
+        System.out.println(e);
+    }
     }
 
     public List<DocumentosDocente> Listar(Tema tema){
